@@ -35,7 +35,7 @@ void AGun::Tick(float DeltaTime)
 
 void AGun::PullTrigger()
 {
-	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlashSocket"));
+	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlashSocket")); // 총구 섬광 스폰 후 붙이기
 
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
 	if (OwnerPawn == nullptr) return;
@@ -47,13 +47,12 @@ void AGun::PullTrigger()
 	OwnerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
 
 	FVector LineEnd = CameraLocation + CameraRotation.Vector() * MaxRange;
-
-	//DrawDebugCamera(GetWorld(), CameraLocation, CameraRotation, 90, 2, FColor::Red, true);
-
 	FHitResult Hit;
 	bool HitFlag = GetWorld()->LineTraceSingleByChannel(Hit, CameraLocation, LineEnd, ECollisionChannel::ECC_GameTraceChannel1);
 	if (HitFlag)
 	{
-		DrawDebugPoint(GetWorld(), Hit.Location, 20, FColor::Green, true);
+		//DrawDebugPoint(GetWorld(), Hit.Location, 20, FColor::Green, true);
+		FVector ShotDirection = -CameraRotation.Vector();
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.Location, ShotDirection.Rotation());	
 	}
 }

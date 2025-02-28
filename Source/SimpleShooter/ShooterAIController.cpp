@@ -8,8 +8,6 @@ void AShooterAIController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-	SetFocus(PlayerPawn);
 }
 
 void AShooterAIController::Tick(float DeltaTime)
@@ -17,5 +15,15 @@ void AShooterAIController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-	MoveToActor(PlayerPawn, 200);
+
+	if (LineOfSightTo(PlayerPawn)) // 시야에 들어왔을 경우
+	{
+		SetFocus(PlayerPawn);
+		MoveToActor(PlayerPawn, AcceptanceRadius = 200);
+	}
+	else
+	{
+		ClearFocus(EAIFocusPriority::Gameplay); // 게임플레이 우선권 해제
+		StopMovement();
+	}
 }

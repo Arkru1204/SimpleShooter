@@ -22,15 +22,4 @@ void AShooterAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-
-	if (LineOfSightTo(PlayerPawn)) // 시야에 들어왔을 경우
-	{
-		GetBlackboardComponent()->SetValueAsVector(TEXT("PlayerLocation"), PlayerPawn->GetActorLocation());
-		GetBlackboardComponent()->SetValueAsVector(TEXT("LastKnownPlayerLocation"), PlayerPawn->GetActorLocation());
-	}
-	else
-	{
-		GetBlackboardComponent()->ClearValue(TEXT("PlayerLocation"));
-	}
 }

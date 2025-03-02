@@ -49,7 +49,10 @@ void AGun::PullTrigger()
 
 	FVector LineEnd = CameraLocation + CameraRotation.Vector() * MaxRange;
 	FHitResult Hit;
-	bool HitFlag = GetWorld()->LineTraceSingleByChannel(Hit, CameraLocation, LineEnd, ECollisionChannel::ECC_GameTraceChannel1);
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this); // 총 무시
+	Params.AddIgnoredActor(GetOwner()); // 소유자 무시
+	bool HitFlag = GetWorld()->LineTraceSingleByChannel(Hit, CameraLocation, LineEnd, ECollisionChannel::ECC_GameTraceChannel1, Params);
 	if (HitFlag)
 	{
 		//DrawDebugPoint(GetWorld(), Hit.Location, 20, FColor::Green, true);

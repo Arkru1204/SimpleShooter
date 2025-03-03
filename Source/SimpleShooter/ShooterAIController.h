@@ -24,4 +24,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* AIBehavior;
 
+public:
+	bool IsDead() const;
+
 };

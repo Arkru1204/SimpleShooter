@@ -2,16 +2,37 @@
 
 
 #include "KillEmAllGameMode.h"
+#include "EngineUtils.h"
+#include "ShooterAIController.h"
 
 void AKillEmAllGameMode::PawnKilled(APawn* PawnKilled)
 {
 	Super::PawnKilled(PawnKilled);
 
-	UE_LOG(LogTemp, Warning, TEXT("A Pawn was killed!"));
+	//UE_LOG(LogTemp, Warning, TEXT("A Pawn was killed!"));
 
-	APlayerController* PlayerController = Cast<APlayerController>(PawnKilled->GetController());
+	APlayerController* PlayerController = Cast<APlayerController>(PawnKilled->GetController()); // 플레이어가 죽었을 때
 	if (PlayerController != nullptr)
 	{
-		PlayerController->GameHasEnded(nullptr, false);
+		EndGame(false);
+	}
+
+	for (AShooterAIController* Controller : TActorRange<AShooterAIController>(GetWorld())) // 월드 내의 AI 컨트롤러들
+	{
+		if (!Controller->IsDead()) // 살아있는 AI가 있으면 리턴
+		{
+			return;
+		}
+	}
+
+	EndGame(true); // 모든 AI가 죽었을 때
+}
+
+void AKillEmAllGameMode::EndGame(bool bIsPlayerWinner)
+{
+	for (AController* Controller : TActorRange<AController>(GetWorld()))
+	{
+		bool bIsWinner = Controller->IsPlayerController() == bIsPlayerWinner; // 플레이어 컨트롤러인지
+		Controller->GameHasEnded(Controller->GetPawn(), bIsWinner);
 	}
 }

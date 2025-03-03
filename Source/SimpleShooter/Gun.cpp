@@ -38,33 +38,48 @@ void AGun::PullTrigger()
 {
 	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlashSocket")); // 총구 섬광 스폰 후 붙이기
 
-	APawn* OwnerPawn = Cast<APawn>(GetOwner());
-	if (OwnerPawn == nullptr) return;
-	AController* OwnerController = OwnerPawn->GetController();
-	if (OwnerController == nullptr) return;
-
-	FVector CameraLocation;
-	FRotator CameraRotation;
-	OwnerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
-
-	FVector LineEnd = CameraLocation + CameraRotation.Vector() * MaxRange;
 	FHitResult Hit;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this); // 총 무시
-	Params.AddIgnoredActor(GetOwner()); // 소유자 무시
-	bool HitFlag = GetWorld()->LineTraceSingleByChannel(Hit, CameraLocation, LineEnd, ECollisionChannel::ECC_GameTraceChannel1, Params);
+	FVector ShotDirection;
+	bool HitFlag = GunTrace(Hit, ShotDirection);
 	if (HitFlag)
 	{
 		//DrawDebugPoint(GetWorld(), Hit.Location, 20, FColor::Green, true);
-		FVector ShotDirection = -CameraRotation.Vector();
+
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.Location, ShotDirection.Rotation());	// 피격 이펙트 스폰
 		
 		AActor* HitActor = Hit.GetActor();
 		if (HitActor != nullptr)
 		{
-			UE_LOG(LogTemp, Display, TEXT("%s"), *HitActor->GetActorLabel());
+			//UE_LOG(LogTemp, Display, TEXT("%s"), *HitActor->GetActorLabel());
 			FPointDamageEvent DamageEvent(Damage, Hit, ShotDirection, nullptr);
+			AController* OwnerController = GetOwnerController();
 			HitActor->TakeDamage(Damage, DamageEvent, OwnerController, this);
 		}
 	}
+}
+
+bool AGun::GunTrace(FHitResult& Hit, FVector& ShotDirection)
+{
+	AController* OwnerController = GetOwnerController();
+	if (OwnerController == nullptr)
+		return false;
+
+	FVector CameraLocation;
+	FRotator CameraRotation;
+	OwnerController->GetPlayerViewPoint(CameraLocation, CameraRotation);
+	ShotDirection = -CameraRotation.Vector();
+
+	FVector LineEnd = CameraLocation + CameraRotation.Vector() * MaxRange;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this); // 총 무시
+	Params.AddIgnoredActor(GetOwner()); // 소유자 무시
+	return GetWorld()->LineTraceSingleByChannel(Hit, CameraLocation, LineEnd, ECollisionChannel::ECC_GameTraceChannel1, Params);
+}
+
+AController* AGun::GetOwnerController() const
+{
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	if (OwnerPawn == nullptr)
+		return nullptr;
+	return OwnerPawn->GetController();
 }

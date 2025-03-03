@@ -43,4 +43,10 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	float Damage = 10;
+
+	// 총알이 맞았는지 여부
+	bool GunTrace(FHitResult& Hit, FVector& ShotDirection); 
+
+	// 총을 소유한 컨트롤러 반환
+	AController* GetOwnerController() const; 
 };

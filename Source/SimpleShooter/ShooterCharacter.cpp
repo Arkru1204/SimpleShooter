@@ -59,14 +59,14 @@ float AShooterCharacter::TakeDamage(float DamageAmount, struct FDamageEvent cons
 
 	if (IsDead())
 	{
-		DetachFromControllerPendingDestroy(); // 컨트롤러 연결 해제
-		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision); // 콜리전 비활성화
-
 		ASimpleShooterGameModeBase* GameMode = GetWorld()->GetAuthGameMode<ASimpleShooterGameModeBase>();
 		if (GameMode != nullptr)
 		{
 			GameMode->PawnKilled(this);
 		}
+
+		DetachFromControllerPendingDestroy(); // 컨트롤러 연결 해제
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision); // 콜리전 비활성화
 	}
 
 	return DamageToApply;

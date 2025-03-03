@@ -37,6 +37,7 @@ void AGun::Tick(float DeltaTime)
 void AGun::PullTrigger()
 {
 	UGameplayStatics::SpawnEmitterAttached(MuzzleFlash, Mesh, TEXT("MuzzleFlashSocket")); // 총구 섬광 스폰 후 붙이기
+	UGameplayStatics::SpawnSoundAttached(MuzzleSound, Mesh, TEXT("MuzzleFlashSocket")); // 총구 사운드 스폰 후 붙이기
 
 	FHitResult Hit;
 	FVector ShotDirection;
@@ -46,6 +47,7 @@ void AGun::PullTrigger()
 		//DrawDebugPoint(GetWorld(), Hit.Location, 20, FColor::Green, true);
 
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactEffect, Hit.Location, ShotDirection.Rotation());	// 피격 이펙트 스폰
+		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), ImpactSound, Hit.Location); // 피격 사운드 스폰
 		
 		AActor* HitActor = Hit.GetActor();
 		if (HitActor != nullptr)
